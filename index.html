@@ -60,7 +60,7 @@
 </div>
 
 <script>
-let year = window.location.pathname.replace("/","") || "2025";
+let year = "2025"; // 初期は2025で固定
 let lang='jp';
 let showDayCount = true; // true=日目, false=年月日
 
@@ -185,7 +185,6 @@ function updateYearButtons(){
 
 function switchYear(y){
   year=y;
-  history.replaceState(null,null,'/'+y);
   updateTexts();
   updateDay();
 }
