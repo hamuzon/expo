@@ -8,63 +8,144 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-body{
+
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body {
   background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  font-family:'Roboto',sans-serif;color:#e0f7fa;
-  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;
+  font-family:'Roboto',sans-serif;
+  color:#e0f7fa;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:1rem;
 }
-.container{
-  background:rgba(255,255,255,0.07);border-radius:24px;
-  padding:3rem 4rem;max-width:420px;width:100%;
-  box-shadow:0 0 20px rgba(0,229,255,0.5);text-align:center;position:relative;
+
+.container {
+  background:rgba(255,255,255,0.07);
+  border-radius:24px;
+  padding:3rem 4rem;
+  max-width:420px;
+  width:100%;
+  box-shadow:0 0 20px rgba(0,229,255,0.5);
+  text-align:center;
+  position:relative;
 }
-h1{font-family:'Orbitron',sans-serif;font-size:2.8rem;color:#00e5ff;
-  text-shadow:0 0 8px #00e5ff,0 0 20px #00e5ff;margin-bottom:0.3rem;}
-h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:#80deea;
-  letter-spacing:0.15em;margin-bottom:2rem;}
-#dayDisplay{font-size:2.5rem;font-weight:700;color:#00fff7;
-  text-shadow:0 0 5px #00fff7,0 0 15px #00fff7;margin-bottom:1.2rem;}
-#hourDisplay,#remainDisplay{font-size:1.2rem;font-weight:500;color:#80deea;
-  margin-bottom:1rem;letter-spacing:0.05em;}
-#remainDisplay{margin-bottom:3rem;}
-.footer{font-size:0.9rem;color:#4dd0e1;letter-spacing:0.1em;user-select:none;}
-.lang-toggle,.year-link,.view-toggle{
-  background: rgba(0,229,255,0.15); border:none; border-radius:20px; color:#00e5ff;
-  font-weight:600; padding:6px 14px; cursor:pointer; font-family:'Roboto',sans-serif;
-  transition:0.3s; margin:0 4px;
+
+h1 {
+  font-family:'Orbitron',sans-serif;
+  font-size:2.8rem;
+  color:#00e5ff;
+  text-shadow:0 0 8px #00e5ff,0 0 20px #00e5ff;
+  margin-bottom:0.3rem;
 }
-.lang-toggle:hover,.year-link:hover,.view-toggle:hover{background: rgba(0,229,255,0.3);}
-.year-links{margin-bottom:1rem;}
-@media(max-width:480px){
-  .container{padding:2rem 2rem;max-width:320px;}
-  h1{font-size:2rem;}#dayDisplay{font-size:2rem;margin-bottom:1rem;}
-  #hourDisplay,#remainDisplay{font-size:1rem;margin-bottom:1rem;}
-  h2{font-size:1rem;margin-bottom:1.5rem;}
+
+h2 {
+  font-family:'Orbitron',sans-serif;
+  font-size:1.1rem;
+  color:#80deea;
+  letter-spacing:0.15em;
+  margin-bottom:2rem;
+}
+
+#dayDisplay {
+  font-size:2.5rem;
+  font-weight:700;
+  color:#00fff7;
+  text-shadow:0 0 5px #00fff7,0 0 15px #00fff7;
+  margin-bottom:1.2rem;
+  word-break:break-word;
+}
+
+#hourDisplay,#remainDisplay {
+  font-size:1.2rem;
+  font-weight:500;
+  color:#80deea;
+  margin-bottom:1rem;
+  letter-spacing:0.05em;
+  word-break:break-word;
+}
+
+#remainDisplay {
+  margin-bottom:3rem;
+}
+
+.footer {
+  font-size:0.9rem;
+  color:#4dd0e1;
+  letter-spacing:0.1em;
+  user-select:none;
+  line-height:1.4;
+}
+
+.lang-toggle, .year-link, .view-toggle {
+  background: rgba(0,229,255,0.15);
+  border:none;
+  border-radius:20px;
+  color:#00e5ff;
+  font-weight:600;
+  padding:6px 14px;
+  cursor:pointer;
+  font-family:'Roboto',sans-serif;
+  transition:0.3s;
+  margin:0 4px;
+}
+
+.lang-toggle:hover, .year-link:hover, .view-toggle:hover {
+  background: rgba(0,229,255,0.3);
+}
+
+.year-links {
+  margin-bottom:1rem;
+}
+
+@media(max-width:480px) {
+  .container {
+    padding:2rem 2rem;
+    max-width:320px;
+  }
+  h1 {font-size:2rem;}
+  #dayDisplay {font-size:2rem;margin-bottom:1rem;}
+  #hourDisplay,#remainDisplay {font-size:1rem;margin-bottom:1rem;}
+  h2 {font-size:1rem;margin-bottom:1.5rem;}
 }
 </style>
 </head>
 <body>
 <div class="container" role="main" aria-live="polite">
+
   <div class="year-links">
     <button class="year-link" onclick="switchYear('2025')">2025</button>
     <button class="year-link" onclick="switchYear('2027')">2027</button>
     <button class="year-link" onclick="switchYear('2030')">2030</button>
     <button class="lang-toggle" aria-label="Toggle Language">EN</button>
   </div>
+
   <button class="view-toggle" onclick="toggleView()" style="display:none;">日目／年月日切替</button>
+
   <h1 id="title">読み込み中…</h1>
   <h2 id="subtitle"></h2>
+
   <p id="dayDisplay">読み込み中…</p>
   <p id="hourDisplay"></p>
   <p id="remainDisplay"></p>
-  <div class="footer" id="footer"></div>
+
+  <div class="footer">
+    <span id="year-hamusata"></span> &copy; <a href="#" target="_blank" rel="noopener noreferrer">@hamusata</a><br>
+    <span id="year-hamuzon"></span> &copy; <a href="#" target="_blank" rel="noopener noreferrer">@hamuzon</a>
+  </div>
+
 </div>
 
 <script>
-let year = localStorage.getItem('expoYear') || '2025';
-let lang = localStorage.getItem('expoLang') || 'jp';
-let showDay = true;
+let year='2025';
+let lang='jp';
+let showDay=true;
 
 const expoDates = {
   "2025":{start:"2025-04-13T00:00:00+09:00",end:"2025-10-13T00:00:00+09:00"},
@@ -79,19 +160,19 @@ const expoTitles = {
 };
 
 const texts = {
-  jp:{subtitle:"開催からの経過日数カウント",loading:"読み込み中…",toggle:"日目／年月日切替"},
-  en:{subtitle:"Days Since Opening",loading:"Loading...",toggle:"Day / YMD Toggle"}
+  jp:{subtitle:"開催からの経過日数カウント",loading:"読み込み中…"},
+  en:{subtitle:"Days Since Opening",loading:"Loading..."}
 };
 
-const dayDisplay=document.getElementById("dayDisplay");
-const hourDisplay=document.getElementById("hourDisplay");
-const remainDisplay=document.getElementById("remainDisplay");
-const titleEl=document.getElementById("title");
-const subtitleEl=document.getElementById("subtitle");
-const footerEl=document.getElementById("footer");
-const langToggleBtn=document.querySelector(".lang-toggle");
-const viewToggleBtn=document.querySelector(".view-toggle");
+const dayDisplay = document.getElementById("dayDisplay");
+const hourDisplay = document.getElementById("hourDisplay");
+const remainDisplay = document.getElementById("remainDisplay");
+const titleEl = document.getElementById("title");
+const subtitleEl = document.getElementById("subtitle");
+const langToggleBtn = document.querySelector(".lang-toggle");
+const viewToggleBtn = document.querySelector(".view-toggle");
 
+// 年月日時間分秒形式
 function formatYMDHMS(ms){
   let sec=Math.floor(ms/1000);
   const y=Math.floor(sec/(365*24*3600)); sec-=y*365*24*3600;
@@ -127,16 +208,16 @@ function updateDay(){
       const diffDays=Math.floor(diffMsStart/(1000*60*60*24))+1;
       dayDisplay.textContent=(lang==='jp')?`今日は万博の ${diffDays} 日目`:`Today is day ${diffDays} of the Expo`;
     }else{
-      dayDisplay.textContent=formatYMDHMS(diffMsStart);
+      dayDisplay.textContent=(lang==='jp'?'経過時間: ':'Elapsed: ') + formatYMDHMS(diffMsStart);
     }
-    remainDisplay.textContent=(lang==='jp')?`残り: ${formatYMDHMS(diffMsEnd)}`:`Remaining: ${formatYMDHMS(diffMsEnd)}`;
+    remainDisplay.textContent=(lang==='jp'?'残り: ':'Remaining: ') + formatYMDHMS(diffMsEnd);
     hourDisplay.textContent="";
   }else{
     viewToggleBtn.style.display="none";
     if(localTime<startDate){
-      dayDisplay.textContent=(lang==='jp')?`開催まで: ${formatYMDHMS(startDate-localTime)}`:`Starts in: ${formatYMDHMS(startDate-localTime)}`;
+      dayDisplay.textContent=(lang==='jp'?'開催まで: ':'Starts in: ') + formatYMDHMS(startDate-localTime);
     }else{
-      dayDisplay.textContent=(lang==='jp')?`終了から: ${formatYMDHMS(localTime-endDate)}`:`Since closing: ${formatYMDHMS(localTime-endDate)}`;
+      dayDisplay.textContent=(lang==='jp'?'終了から: ':'Since closing: ') + formatYMDHMS(localTime-endDate);
     }
     hourDisplay.textContent="";
     remainDisplay.textContent="";
@@ -144,23 +225,20 @@ function updateDay(){
 }
 
 function updateTexts(){
-  titleEl.textContent=expoTitles[year][lang];
-  subtitleEl.textContent=texts[lang].subtitle;
-  footerEl.textContent=`開催期間: ${expoDates[year].start.split("T")[0]} ～ ${expoDates[year].end.split("T")[0]}`;
-  langToggleBtn.textContent=(lang==='jp')?'EN':'JP';
-  viewToggleBtn.textContent=texts[lang].toggle;
+  titleEl.textContent = expoTitles[year][lang];
+  subtitleEl.textContent = texts[lang].subtitle;
+  langToggleBtn.textContent = (lang==='jp')?'EN':'JP';
+  viewToggleBtn.textContent = (lang==='jp')?'日目／年月日切替':'Day / YMD Toggle';
 }
 
 function toggleLanguage(){
-  lang=(lang==='jp')?'en':'jp';
-  localStorage.setItem('expoLang', lang);
+  lang = (lang==='jp')?'en':'jp';
   updateTexts();
   updateDay();
 }
 
 function switchYear(y){
   year=y;
-  localStorage.setItem('expoYear', year);
   updateTexts();
   updateDay();
 }
@@ -176,6 +254,41 @@ dayDisplay.textContent=texts[lang].loading;
 updateTexts();
 updateDay();
 setInterval(updateDay,1000);
+
+// --- コピーライト 年表示処理 ---
+document.addEventListener("DOMContentLoaded", () => {
+  const baseYear = 2025;
+  const currentYear = new Date().getFullYear();
+  const yearDisplay = currentYear > baseYear ? `${baseYear}~${currentYear}` : `${baseYear}`;
+
+  const hostname = location.hostname;
+
+  const hamusataEl = document.getElementById("year-hamusata");
+  const hamusataLinkEl = hamusataEl.nextElementSibling;
+  const hamuzonEl = document.getElementById("year-hamuzon");
+  const hamuzonLinkEl = hamuzonEl.nextElementSibling;
+
+  // デフォルトリンク
+  let hamusataLink = "https://home.hamusata.f5.si";
+  let hamusataText = "@hamusata";
+  let hamuzonLink = "https://hamuzon.github.io";
+  let hamuzonText = "@hamuzon";
+
+  if(hostname.endsWith(".hamusata.f5.si")){
+    hamusataLink = `https://${hostname}`;
+  }
+  else if(hostname.endsWith(".hamuzon-jp.f5.si") || hostname.endsWith("hamuzon.web.fc2.com") || hostname.endsWith("hamuzon.github.io")){
+    hamuzonLink = `https://${hostname}`;
+  }
+
+  hamusataEl.textContent = yearDisplay;
+  hamusataLinkEl.href = hamusataLink;
+  hamusataLinkEl.textContent = hamusataText;
+
+  hamuzonEl.textContent = yearDisplay;
+  hamuzonLinkEl.href = hamuzonLink;
+  hamuzonLinkEl.textContent = hamuzonText;
+});
 </script>
 </body>
 </html>
