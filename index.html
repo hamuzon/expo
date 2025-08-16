@@ -8,7 +8,6 @@
 <link rel="icon" href="icon.png" type="image/png" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap');
-
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
@@ -22,33 +21,35 @@
   }
   h1 { font-family:'Orbitron',sans-serif; font-size:2.8rem; color:#00e5ff;
        text-shadow:0 0 8px #00e5ff,0 0 20px #00e5ff; margin-bottom:0.3rem; }
-  h2 { font-family:'Orbitron',sans-serif; font-size:1.1rem; color:#80deea; letter-spacing:0.15em; margin-bottom:2rem; }
-  #dayDisplay { font-size:2.5rem; font-weight:700; color:#00fff7; text-shadow:0 0 5px #00fff7,0 0 15px #00fff7; margin-bottom:1.2rem; }
+  h2 { font-family:'Orbitron',sans-serif; font-size:1.1rem; color:#80deea; letter-spacing:0.15em; margin-bottom:1rem; }
+  #dayDisplay { font-size:2.5rem; font-weight:700; color:#00fff7; text-shadow:0 0 5px #00fff7,0 0 15px #00fff7; margin-bottom:1rem; }
   #hourDisplay,#remainDisplay { font-size:1.2rem; font-weight:500; color:#80deea; margin-bottom:1rem; letter-spacing:0.05em; }
-  #remainDisplay { margin-bottom:3rem; }
+  #remainDisplay { margin-bottom:1.5rem; }
   .footer { font-size:0.9rem; color:#4dd0e1; letter-spacing:0.1em; user-select:none; }
-  .lang-toggle, .year-link {
+  .lang-toggle, .year-link, .toggle-format {
     background: rgba(0,229,255,0.15); border:none; border-radius:20px; color:#00e5ff;
     font-weight:600; padding:6px 14px; cursor:pointer; font-family:'Roboto',sans-serif; transition:0.3s;
-    margin:0 4px;
+    margin:0 4px; 
   }
-  .lang-toggle:hover, .year-link:hover { background: rgba(0,229,255,0.3); }
-  .year-links { margin-bottom:1rem; }
+  .lang-toggle:hover, .year-link:hover, .toggle-format:hover { background: rgba(0,229,255,0.3); }
+  .year-links { margin-bottom:1rem; display:flex; justify-content:center; flex-wrap:wrap; }
+  .year-link.active { background:#00e5ff; color:#0f2027; font-weight:700; }
   @media(max-width:480px){
     .container{padding:2rem 2rem; max-width:320px;}
     h1{font-size:2rem;}#dayDisplay{font-size:2rem;margin-bottom:1rem;}
     #hourDisplay,#remainDisplay{font-size:1rem;margin-bottom:1rem;}
-    h2{font-size:1rem;margin-bottom:1.5rem;}
+    h2{font-size:1rem;margin-bottom:1rem;}
   }
 </style>
 </head>
 <body>
 <div class="container" role="main" aria-live="polite">
   <div class="year-links">
-    <button class="year-link" onclick="switchYear('2025')">2025</button>
-    <button class="year-link" onclick="switchYear('2027')">2027</button>
-    <button class="year-link" onclick="switchYear('2030')">2030</button>
+    <button class="year-link" id="btn-2025" onclick="switchYear('2025')">2025</button>
+    <button class="year-link" id="btn-2027" onclick="switchYear('2027')">2027</button>
+    <button class="year-link" id="btn-2030" onclick="switchYear('2030')">2030</button>
     <button class="lang-toggle" aria-label="Toggle Language">EN</button>
+    <button class="toggle-format" onclick="toggleDayFormat()">切替</button>
   </div>
   <h1 id="title">読み込み中…</h1>
   <h2 id="subtitle"></h2>
@@ -61,6 +62,7 @@
 <script>
 let year = window.location.pathname.replace("/","") || "2025";
 let lang='jp';
+let showDayCount = true; // true=日目, false=年月日
 
 const expoDates = {
   "2025": { start: "2025-04-13T00:00:00+09:00", end: "2025-10-13T00:00:00+09:00" },
@@ -87,12 +89,22 @@ const texts = {
   en:{ subtitle:"Days Since Opening", loading:"Loading..."}
 };
 
+// ms → d,h,m,s
 function formatRemaining(ms){
   const d=Math.floor(ms/(1000*60*60*24));
   const h=Math.floor((ms%(1000*60*60*24))/(1000*60*60));
   const m=Math.floor((ms%(1000*60*60))/(1000*60));
   const s=Math.floor((ms%(1000*60))/1000);
   return {d,h,m,s};
+}
+
+// ms → 年月日
+function msToYMD(ms){
+  const totalDays = Math.floor(ms / (1000*60*60*24));
+  const years = Math.floor(totalDays/365);
+  const months = Math.floor((totalDays%365)/30);
+  const days = totalDays - years*365 - months*30;
+  return {years, months, days};
 }
 
 function updateDay(){
@@ -103,27 +115,34 @@ function updateDay(){
 
   const startDate=new Date(expoDates[year].start);
   const endDate=new Date(expoDates[year].end);
-  const t = texts[lang];
 
   if(localTime < startDate){
-    // 開始前
-    const {d,h,m,s} = formatRemaining(startDate-localTime);
-    dayDisplay.textContent = (lang==='jp')? `開催まであと ${d} 日` : `Starts in ${d} days`;
+    const {years, months, days} = msToYMD(startDate-localTime);
+    dayDisplay.textContent = (lang==='jp')? `開催まで ${years}年${months}ヶ月${days}日` : `Starts in ${years}y ${months}m ${days}d`;
+    const {h,m,s} = formatRemaining(startDate-localTime);
     hourDisplay.textContent = `${h}h ${m}m ${s}s`;
     remainDisplay.textContent = "";
   }
   else if(localTime > endDate){
-    // 終了後
-    const {d,h,m,s} = formatRemaining(localTime-endDate);
-    dayDisplay.textContent = (lang==='jp')? `終了から ${d} 日経過` : `${d} days since closing`;
+    const {years, months, days} = msToYMD(localTime-endDate);
+    dayDisplay.textContent = (lang==='jp')? `終了から ${years}年${months}ヶ月${days}日` : `Since closing: ${years}y ${months}m ${days}d`;
+    const {h,m,s} = formatRemaining(localTime-endDate);
     hourDisplay.textContent = `${h}h ${m}m ${s}s`;
     remainDisplay.textContent = "";
   }
   else{
-    // 開催中
-    const diffDays=Math.floor((localTime-startDate)/(1000*60*60*24))+1;
-    dayDisplay.textContent = (lang==='jp')? `今日は万博の ${diffDays} 日目` : `Today is day ${diffDays} of the Expo`;
-    const {d,h,m,s} = formatRemaining(localTime-startDate);
+    const diffMs = localTime-startDate;
+    const diffDays = Math.floor(diffMs/(1000*60*60*24))+1;
+
+    if(showDayCount){
+      dayDisplay.textContent = (lang==='jp')? `今日は万博の ${diffDays} 日目` : `Today is day ${diffDays} of the Expo`;
+    } else {
+      const {years, months, days} = msToYMD(diffMs);
+      dayDisplay.textContent = (lang==='jp')? `開催から ${years}年${months}ヶ月${days}日` 
+                                        : `Time since opening: ${years}y ${months}m ${days}d`;
+    }
+
+    const {d,h,m,s} = formatRemaining(diffMs);
     hourDisplay.textContent = `経過: ${d}d ${h}h ${m}m ${s}s`;
     const remain = formatRemaining(endDate-localTime);
     remainDisplay.textContent = `残り: ${remain.d}d ${remain.h}h ${remain.m}m ${remain.s}s`;
@@ -135,12 +154,26 @@ function updateTexts(){
   subtitleEl.textContent = texts[lang].subtitle;
   footerEl.textContent = `開催期間: ${expoDates[year].start.split("T")[0]} ～ ${expoDates[year].end.split("T")[0]}`;
   langToggleBtn.textContent = (lang==='jp')? 'EN' : 'JP';
+  updateYearButtons();
 }
 
 function toggleLanguage(){
   lang = (lang==='jp')?'en':'jp';
   updateTexts();
   updateDay();
+}
+
+function toggleDayFormat(){
+  showDayCount = !showDayCount;
+  updateDay();
+}
+
+function updateYearButtons(){
+  ['2025','2027','2030'].forEach(y=>{
+    const btn = document.getElementById('btn-'+y);
+    if(y === year) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
 }
 
 function switchYear(y){
