@@ -16,7 +16,7 @@
 }
 
 body {
-  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
   font-family: 'Roboto', sans-serif;
   color: #e0f7fa;
   min-height: 100vh;
@@ -27,12 +27,12 @@ body {
 }
 
 .container {
-  background: rgba(255,255,255,0.07);
+  background: rgba(255, 255, 255, 0.07);
   border-radius: 24px;
   padding: 3rem 4rem;
   max-width: 420px;
   width: 100%;
-  box-shadow: 0 0 20px rgba(0,229,255,0.5);
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
   text-align: center;
   position: relative;
 }
@@ -61,7 +61,8 @@ h2 {
   margin-bottom: 1.2rem;
 }
 
-#hourDisplay, #remainDisplay {
+#hourDisplay,
+#remainDisplay {
   font-size: 1.2rem;
   font-weight: 500;
   color: #80deea;
@@ -81,8 +82,24 @@ h2 {
   margin-top: 1rem;
 }
 
-.lang-toggle, .year-link, .view-toggle {
-  background: rgba(0,229,255,0.15);
+.footer a.link {
+  text-decoration: none;
+  color: #4ac8e0;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.footer a.link:hover,
+.footer a.link:visited,
+.footer a.link:active {
+  color: #4ac8e0;
+  text-decoration: underline;
+}
+
+.lang-toggle,
+.year-link,
+.view-toggle {
+  background: rgba(0, 229, 255, 0.15);
   border: none;
   border-radius: 20px;
   color: #00e5ff;
@@ -94,8 +111,10 @@ h2 {
   margin: 0 4px;
 }
 
-.lang-toggle:hover, .year-link:hover, .view-toggle:hover {
-  background: rgba(0,229,255,0.3);
+.lang-toggle:hover,
+.year-link:hover,
+.view-toggle:hover {
+  background: rgba(0, 229, 255, 0.3);
 }
 
 .year-links {
@@ -107,11 +126,24 @@ h2 {
     padding: 2rem 2rem;
     max-width: 320px;
   }
-  h1 { font-size: 2rem; }
-  #dayDisplay { font-size: 2rem; margin-bottom: 1rem; }
-  #hourDisplay, #remainDisplay { font-size: 1rem; margin-bottom: 1rem; }
-  h2 { font-size: 1rem; margin-bottom: 1.5rem; }
+  h1 {
+    font-size: 2rem;
+  }
+  #dayDisplay {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  #hourDisplay,
+  #remainDisplay {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  h2 {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
 }
+
 </style>
 </head>
 <body>
