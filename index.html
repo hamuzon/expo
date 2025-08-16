@@ -83,13 +83,13 @@ const titleEl = document.getElementById("title");
 const subtitleEl = document.getElementById("subtitle");
 const footerEl = document.getElementById("footer");
 const langToggleBtn = document.querySelector(".lang-toggle");
+const toggleBtn = document.querySelector(".toggle-format");
 
 const texts = {
-  jp:{ subtitle:"開催からの経過日数カウント", loading:"読み込み中…"},
-  en:{ subtitle:"Days Since Opening", loading:"Loading..."}
+  jp:{ subtitle:"開催からの経過日数カウント", loading:"読み込み中…", toggle:"切替"},
+  en:{ subtitle:"Days Since Opening", loading:"Loading...", toggle:"Toggle"}
 };
 
-// ms → d,h,m,s
 function formatRemaining(ms){
   const d=Math.floor(ms/(1000*60*60*24));
   const h=Math.floor((ms%(1000*60*60*24))/(1000*60*60));
@@ -98,7 +98,6 @@ function formatRemaining(ms){
   return {d,h,m,s};
 }
 
-// ms → 年月日
 function msToYMD(ms){
   const totalDays = Math.floor(ms / (1000*60*60*24));
   const years = Math.floor(totalDays/365);
@@ -108,13 +107,21 @@ function msToYMD(ms){
 }
 
 function updateDay(){
-  const now=new Date();
-  const utc=now.getTime() + (now.getTimezoneOffset()*60000);
-  const expoOffset=(year==="2030"?3:9)*60*60*1000;
-  const localTime=new Date(utc + expoOffset);
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset()*60000);
+  const expoOffset = (year==="2030"?3:9)*60*60*1000;
+  const localTime = new Date(utc + expoOffset);
 
-  const startDate=new Date(expoDates[year].start);
-  const endDate=new Date(expoDates[year].end);
+  const startDate = new Date(expoDates[year].start);
+  const endDate = new Date(expoDates[year].end);
+
+  // 切替ボタン表示制御
+  if(localTime < startDate || localTime > endDate){
+    toggleBtn.style.display = "none";
+  } else {
+    toggleBtn.style.display = "inline-block";
+    toggleBtn.textContent = (lang==='jp') ? texts.jp.toggle : texts.en.toggle;
+  }
 
   if(localTime < startDate){
     const {years, months, days} = msToYMD(startDate-localTime);
