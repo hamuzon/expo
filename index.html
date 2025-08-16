@@ -62,25 +62,25 @@ h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;color:#80deea;
 </div>
 
 <script>
-let year='2025';
-let lang='jp';
-let showDay=true;
+let year = localStorage.getItem('expoYear') || '2025';
+let lang = localStorage.getItem('expoLang') || 'jp';
+let showDay = true;
 
-const expoDates={
+const expoDates = {
   "2025":{start:"2025-04-13T00:00:00+09:00",end:"2025-10-13T00:00:00+09:00"},
   "2027":{start:"2027-04-01T00:00:00+09:00",end:"2027-07-01T00:00:00+09:00"},
   "2030":{start:"2030-04-01T00:00:00+03:00",end:"2030-10-01T00:00:00+03:00"}
 };
 
-const expoTitles={
+const expoTitles = {
   "2025":{jp:"2025 日本万博",en:"Expo 2025 Japan"},
   "2027":{jp:"2027 横浜万博",en:"Expo 2027 Yokohama"},
   "2030":{jp:"2030 リヤド万博",en:"Expo 2030 Riyadh"}
 };
 
-const texts={
-  jp:{subtitle:"開催からの経過日数カウント",loading:"読み込み中…"},
-  en:{subtitle:"Days Since Opening",loading:"Loading..."}
+const texts = {
+  jp:{subtitle:"開催からの経過日数カウント",loading:"読み込み中…",toggle:"日目／年月日切替"},
+  en:{subtitle:"Days Since Opening",loading:"Loading...",toggle:"Day / YMD Toggle"}
 };
 
 const dayDisplay=document.getElementById("dayDisplay");
@@ -92,7 +92,6 @@ const footerEl=document.getElementById("footer");
 const langToggleBtn=document.querySelector(".lang-toggle");
 const viewToggleBtn=document.querySelector(".view-toggle");
 
-// 年月日時間分秒形式
 function formatYMDHMS(ms){
   let sec=Math.floor(ms/1000);
   const y=Math.floor(sec/(365*24*3600)); sec-=y*365*24*3600;
@@ -149,17 +148,19 @@ function updateTexts(){
   subtitleEl.textContent=texts[lang].subtitle;
   footerEl.textContent=`開催期間: ${expoDates[year].start.split("T")[0]} ～ ${expoDates[year].end.split("T")[0]}`;
   langToggleBtn.textContent=(lang==='jp')?'EN':'JP';
-  viewToggleBtn.textContent=(lang==='jp')?'日目／年月日切替':'Day / YMD Toggle';
+  viewToggleBtn.textContent=texts[lang].toggle;
 }
 
 function toggleLanguage(){
   lang=(lang==='jp')?'en':'jp';
+  localStorage.setItem('expoLang', lang);
   updateTexts();
   updateDay();
 }
 
 function switchYear(y){
   year=y;
+  localStorage.setItem('expoYear', year);
   updateTexts();
   updateDay();
 }
