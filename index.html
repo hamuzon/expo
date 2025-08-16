@@ -83,18 +83,8 @@ const footerEl = document.getElementById("footer");
 const langToggleBtn = document.querySelector(".lang-toggle");
 
 const texts = {
-  jp:{ subtitle:"開催からの経過日数カウント", loading:"読み込み中…", notStarted:"万博はまだ始まっていません。", ended:"万博は終了しました。",
-       dayCount: day => `今日は万博の${day}日目です。`,
-       timeSinceStart: (d,h,m,s)=>`開催開始から経過した時間：${d}日 ${h}時間${m}分${s}秒`,
-       remainToStart: (d,h,m,s)=>`開始まで：${d}日 ${h}時間${m}分${s}秒`,
-       remainToEnd: (d,h,m,s)=>`終了まで：${d}日 ${h}時間${m}分${s}秒`,
-       toggleLabel:"EN"},
-  en:{ subtitle:"Days Since Opening", loading:"Loading...", notStarted:"The Expo hasn't started yet.", ended:"The Expo has ended.",
-       dayCount: day => `Today is day ${day} of the Expo.`,
-       timeSinceStart: (d,h,m,s)=>`Time since opening: ${d}d ${h}h ${m}m ${s}s`,
-       remainToStart: (d,h,m,s)=>`Time until opening: ${d}d ${h}h ${m}m ${s}s`,
-       remainToEnd: (d,h,m,s)=>`Time until closing: ${d}d ${h}h ${m}m ${s}s`,
-       toggleLabel:"JP"}
+  jp:{ subtitle:"開催からの経過日数カウント", loading:"読み込み中…"},
+  en:{ subtitle:"Days Since Opening", loading:"Loading..."}
 };
 
 function formatRemaining(ms){
@@ -107,48 +97,48 @@ function formatRemaining(ms){
 
 function updateDay(){
   const now=new Date();
-  const utc=now.getTime()+(now.getTimezoneOffset()*60000);
+  const utc=now.getTime() + (now.getTimezoneOffset()*60000);
   const expoOffset=(year==="2030"?3:9)*60*60*1000;
-  const localTime=new Date(utc+expoOffset);
+  const localTime=new Date(utc + expoOffset);
 
-  const t=texts[lang];
   const startDate=new Date(expoDates[year].start);
   const endDate=new Date(expoDates[year].end);
-  const today=new Date(localTime.getFullYear(),localTime.getMonth(),localTime.getDate());
+  const t = texts[lang];
 
-  if(localTime<startDate){
-    const diffMs=startDate-localTime;
-    const {d,h,m,s}=formatRemaining(diffMs);
-    dayDisplay.textContent=t.notStarted;
-    hourDisplay.textContent="";
-    remainDisplay.textContent=t.remainToStart(d,h,m,s);
-  } else if(localTime>endDate){
-    dayDisplay.textContent=t.ended;
-    hourDisplay.textContent="";
-    remainDisplay.textContent="";
-  } else{
-    const diffDays=Math.floor((today-startDate)/(1000*60*60*24))+1;
-    dayDisplay.textContent=t.dayCount(diffDays);
-
-    const elapsedMs=localTime-startDate;
-    const {d,h,m,s}=formatRemaining(elapsedMs);
-    hourDisplay.textContent=t.timeSinceStart(d,h,m,s);
-
-    const remainMs=endDate-localTime;
-    const remain=formatRemaining(remainMs);
-    remainDisplay.textContent=t.remainToEnd(remain.d,remain.h,remain.m,remain.s);
+  if(localTime < startDate){
+    // 開始前
+    const {d,h,m,s} = formatRemaining(startDate-localTime);
+    dayDisplay.textContent = (lang==='jp')? `開催まであと ${d} 日` : `Starts in ${d} days`;
+    hourDisplay.textContent = `${h}h ${m}m ${s}s`;
+    remainDisplay.textContent = "";
+  }
+  else if(localTime > endDate){
+    // 終了後
+    const {d,h,m,s} = formatRemaining(localTime-endDate);
+    dayDisplay.textContent = (lang==='jp')? `終了から ${d} 日経過` : `${d} days since closing`;
+    hourDisplay.textContent = `${h}h ${m}m ${s}s`;
+    remainDisplay.textContent = "";
+  }
+  else{
+    // 開催中
+    const diffDays=Math.floor((localTime-startDate)/(1000*60*60*24))+1;
+    dayDisplay.textContent = (lang==='jp')? `今日は万博の ${diffDays} 日目` : `Today is day ${diffDays} of the Expo`;
+    const {d,h,m,s} = formatRemaining(localTime-startDate);
+    hourDisplay.textContent = `経過: ${d}d ${h}h ${m}m ${s}s`;
+    const remain = formatRemaining(endDate-localTime);
+    remainDisplay.textContent = `残り: ${remain.d}d ${remain.h}h ${remain.m}m ${remain.s}s`;
   }
 }
 
 function updateTexts(){
-  titleEl.textContent=expoTitles[year][lang];
-  subtitleEl.textContent=texts[lang].subtitle;
-  langToggleBtn.textContent=texts[lang].toggleLabel;
-  footerEl.textContent=`開催期間: ${expoDates[year].start.split("T")[0]} ～ ${expoDates[year].end.split("T")[0]}`;
+  titleEl.textContent = expoTitles[year][lang];
+  subtitleEl.textContent = texts[lang].subtitle;
+  footerEl.textContent = `開催期間: ${expoDates[year].start.split("T")[0]} ～ ${expoDates[year].end.split("T")[0]}`;
+  langToggleBtn.textContent = (lang==='jp')? 'EN' : 'JP';
 }
 
 function toggleLanguage(){
-  lang=(lang==='jp'?'en':'jp');
+  lang = (lang==='jp')?'en':'jp';
   updateTexts();
   updateDay();
 }
@@ -162,7 +152,7 @@ function switchYear(y){
 
 langToggleBtn.addEventListener('click',toggleLanguage);
 
-dayDisplay.textContent=texts[lang].loading;
+dayDisplay.textContent = texts[lang].loading;
 updateTexts();
 updateDay();
 setInterval(updateDay,1000);
