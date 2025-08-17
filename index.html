@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Expo Countdown</title>
-<meta name="description" content="国際博覧会(万博)の開催日数カウント" />
+<title>2025大阪・関西万博 Countdown</title>
+<meta name="description" content="2025大阪・関西万博の開催日数カウント / Countdown of Expo 2025 Osaka, Kansai, Japan" />
+<meta name="keywords" content="Expo 2025, 大阪万博, 関西万博, 万博カウント, International Exposition, Osaka, Kansai, Japan" />
+<meta name="author" content="hamuzon" />
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap');
@@ -143,7 +145,6 @@ h2 {
     margin-bottom: 1.5rem;
   }
 }
-
 </style>
 </head>
 <body>
@@ -177,9 +178,9 @@ const expoDates = {
 };
 
 const expoTitles = {
-  "2025": {jp:"2025 日本万博", en:"Expo 2025 Japan"},
-  "2027": {jp:"2027 横浜万博", en:"Expo 2027 Yokohama"},
-  "2030": {jp:"2030 リヤド万博", en:"Expo 2030 Riyadh"}
+  "2025": {jp:"2025大阪・関西万博", en:"Expo 2025 Osaka, Kansai, Japan"},
+  "2027": {jp:"2027横浜万博", en:"Expo 2027 Yokohama"},
+  "2030": {jp:"2030リヤド万博", en:"Expo 2030 Riyadh"}
 };
 
 const texts = {
@@ -195,7 +196,6 @@ const subtitleEl = document.getElementById("subtitle");
 const langToggleBtn = document.querySelector(".lang-toggle");
 const viewToggleBtn = document.querySelector(".view-toggle");
 
-// 年月日時間分秒形式
 function formatYMDHMS(ms) {
   let sec = Math.floor(ms / 1000);
   const y = Math.floor(sec / (365*24*3600)); sec -= y*365*24*3600;
@@ -280,39 +280,39 @@ updateDay();
 setInterval(updateDay, 1000);
 
 // フッター動的表示コード
-(function() {
-  const baseYear = 2025;
-  const currentYear = new Date().getFullYear();
-  const hostname = location.hostname;
-  const footer = document.getElementById("footer-copy");
+  (function() {
+    const baseYear = 2025;
+    const currentYear = new Date().getFullYear();
+    const hostname = location.hostname;
+    const footer = document.getElementById("footer-copy");
 
-  let footerHTML = "";
+    let footerHTML = "";
 
-  if (hostname === "hamuzon.github.io") {
-    // hamuzon.github.io系
-    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                 `<a class="link" href="https://hamuzon.github.io" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
-  } else if (hostname.includes("hamusata.f5.si")) {
-    // *.hamusata.f5.si系
-    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                 `<a class="link" href="https://home.hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>`;
-  } else if (hostname.includes("hamuzon-jp.f5.si")) {
-    // *.hamuzon-jp.f5.si系
-    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                 `<a class="link" href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
-  } else if (hostname.includes("hamuzon.web.fc2.com")) {
-    // hamuzon.web.fc2.com系
-    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                 `<a class="link" href="https://hamuzon.web.fc2.com" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
-  } else {
-    // その他
-    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} Expo Countdown`;
-  }
+    if (hostname === "hamuzon.github.io") {
+      // hamuzon.github.io系
+      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                   `<a class="link" href="https://hamuzon.github.io" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+    } else if (hostname.includes("hamusata.f5.si")) {
+      // *.hamusata.f5.si系
+      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                   `<a class="link" href="https://home.hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>`;
+    } else if (hostname.includes("hamuzon-jp.f5.si")) {
+      // *.hamuzon-jp.f5.si系
+      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                   `<a class="link" href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+    } else if (hostname.includes("hamuzon.web.fc2.com")) {
+      // hamuzon.web.fc2.com系
+      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                   `<a class="link" href="https://hamuzon.web.fc2.com" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+    } else {
+      // その他
+      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} Expo Countdown`;
+    }
 
-  if (footer) {
-    footer.innerHTML = footerHTML;
-  }
-})();
+    if (footer) {
+      footer.innerHTML = footerHTML;
+    }
+  })();
 
 </script>
 </body>
