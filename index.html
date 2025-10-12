@@ -73,7 +73,16 @@ h2 {
 }
 
 #remainDisplay {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
+}
+
+.notice {
+  font-size: 0.85rem;
+  color: #4dd0e1;
+  opacity: 0.8;
+  margin-top: 1rem;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
 }
 
 .footer {
@@ -163,6 +172,10 @@ h2 {
   <p id="hourDisplay"></p>
   <p id="remainDisplay"></p>
 
+  <p class="notice" id="notice-text">
+    ※表示されているカウントダウンは目安であり、正確な開催時刻とは異なる場合があります。
+  </p>
+
   <div class="footer" id="footer-copy"></div>
 </div>
 
@@ -184,8 +197,16 @@ const expoTitles = {
 };
 
 const texts = {
-  jp: {subtitle:"開催からの経過日数カウント", loading:"読み込み中…"},
-  en: {subtitle:"Days Since Opening", loading:"Loading..."}
+  jp: {
+    subtitle:"開催からの経過日数カウント",
+    loading:"読み込み中…",
+    notice:"※表示されているカウントダウンは目安であり、正確な開催時刻とは異なる場合があります。"
+  },
+  en: {
+    subtitle:"Days Since Opening",
+    loading:"Loading...",
+    notice:"*The displayed countdown is approximate and may not reflect the exact event time."
+  }
 };
 
 const dayDisplay = document.getElementById("dayDisplay");
@@ -195,6 +216,7 @@ const titleEl = document.getElementById("title");
 const subtitleEl = document.getElementById("subtitle");
 const langToggleBtn = document.querySelector(".lang-toggle");
 const viewToggleBtn = document.querySelector(".view-toggle");
+const noticeText = document.getElementById("notice-text");
 
 function formatYMDHMS(ms) {
   let sec = Math.floor(ms / 1000);
@@ -252,6 +274,7 @@ function updateTexts() {
   subtitleEl.textContent = texts[lang].subtitle;
   langToggleBtn.textContent = lang==='jp'?'EN':'JP';
   viewToggleBtn.textContent = lang==='jp'?'日目／年月日切替':'Day / YMD Toggle';
+  noticeText.textContent = texts[lang].notice;
 }
 
 function toggleLanguage() {
@@ -279,41 +302,35 @@ updateTexts();
 updateDay();
 setInterval(updateDay, 1000);
 
-// フッター動的表示コード
-  (function() {
-    const baseYear = 2025;
-    const currentYear = new Date().getFullYear();
-    const hostname = location.hostname;
-    const footer = document.getElementById("footer-copy");
+// フッター動的表示
+(function() {
+  const baseYear = 2025;
+  const currentYear = new Date().getFullYear();
+  const hostname = location.hostname;
+  const footer = document.getElementById("footer-copy");
 
-    let footerHTML = "";
+  let footerHTML = "";
 
-    if (hostname === "hamuzon.github.io") {
-      // hamuzon.github.io系
-      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                   `<a class="link" href="https://hamuzon.github.io" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
-    } else if (hostname.includes("hamusata.f5.si")) {
-      // *.hamusata.f5.si系
-      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                   `<a class="link" href="https://home.hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>`;
-    } else if (hostname.includes("hamuzon-jp.f5.si")) {
-      // *.hamuzon-jp.f5.si系
-      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                   `<a class="link" href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
-    } else if (hostname.includes("hamuzon.web.fc2.com")) {
-      // hamuzon.web.fc2.com系
-      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
-                   `<a class="link" href="https://hamuzon.web.fc2.com" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
-    } else {
-      // その他
-      footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} Expo Countdown`;
-    }
+  if (hostname === "hamuzon.github.io") {
+    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                 `<a class="link" href="https://hamuzon.github.io" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+  } else if (hostname.includes("hamusata.f5.si")) {
+    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                 `<a class="link" href="https://home.hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>`;
+  } else if (hostname.includes("hamuzon-jp.f5.si")) {
+    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                 `<a class="link" href="https://hamuzon-jp.f5.si" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+  } else if (hostname.includes("hamuzon.web.fc2.com")) {
+    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} ` +
+                 `<a class="link" href="https://hamuzon.web.fc2.com" target="_blank" rel="noopener noreferrer">@hamuzon</a>`;
+  } else {
+    footerHTML = `&copy; ${baseYear}${currentYear > baseYear ? "–" + currentYear : ""} Expo Countdown`;
+  }
 
-    if (footer) {
-      footer.innerHTML = footerHTML;
-    }
-  })();
-
+  if (footer) {
+    footer.innerHTML = footerHTML;
+  }
+})();
 </script>
 </body>
 </html>
