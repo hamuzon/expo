@@ -28,11 +28,10 @@ body {
   padding: 1rem;
 }
 
-/* 背景アニメーション */
 @keyframes bgAnim {
-  0% {background-position:0% 50%;}
-  50% {background-position:100% 50%;}
-  100% {background-position:0% 50%;}
+  0% { background-position:0% 50%; }
+  50% { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
 }
 
 .container {
@@ -62,10 +61,10 @@ h2 {
   font-family: 'Orbitron', sans-serif;
   font-size: 1.1rem;
   background: linear-gradient(90deg,#00aaff,#00ffdd);
-  -webkit-background-clip:text;
-  color:transparent;
+  -webkit-background-clip: text;
+  color: transparent;
   letter-spacing:0.15em;
-  margin-bottom:2rem;
+  margin-bottom: 2rem;
 }
 
 /* 日数カウント */
@@ -79,7 +78,7 @@ h2 {
   margin-bottom:1.2rem;
 }
 
-#hourDisplay,#remainDisplay {
+#hourDisplay, #remainDisplay {
   font-size:1.2rem;
   font-weight:500;
   background: linear-gradient(90deg,#00ffff,#00aaff);
@@ -120,9 +119,7 @@ h2 {
 .footer a.link:active { color:#4ac8e0; text-decoration:underline; }
 
 /* ボタン */
-.lang-toggle,
-.year-link,
-.view-toggle {
+.lang-toggle, .year-link, .view-toggle {
   background: rgba(0,229,255,0.15);
   border:none;
   border-radius:20px;
@@ -150,10 +147,11 @@ h2 {
 }
 </style>
 </head>
-<body>
 
+<body>
 <div class="container" role="main" aria-live="polite">
 
+  <!-- 年切替 / 言語切替 -->
   <div class="year-links">
     <button class="year-link" onclick="switchYear('2025')">2025</button>
     <button class="year-link" onclick="switchYear('2027')">2027</button>
@@ -163,14 +161,15 @@ h2 {
 
   <button class="view-toggle" onclick="toggleView()" style="display:none;">日目／年月日切替</button>
 
+  <!-- タイトル / サブタイトル / カウント表示 -->
   <h1 id="title">読み込み中…</h1>
   <h2 id="subtitle"></h2>
   <p id="dayDisplay">読み込み中…</p>
   <p id="hourDisplay"></p>
   <p id="remainDisplay"></p>
-
   <p class="notice" id="notice-text"></p>
 
+  <!-- フッター -->
   <div class="footer" id="footer-copy"></div>
 </div>
 
@@ -178,6 +177,7 @@ h2 {
 // --- 初期変数 ---
 let year='2025', lang='jp', showDay=true;
 
+// --- データ ---
 const expoDates={
   "2025": {start:"2025-04-13T10:00:00+09:00", end:"2025-10-13T20:00:00+09:00"},
   "2027": {start:"2027-04-01T00:00:00+09:00", end:"2027-07-01T00:00:00+09:00"},
@@ -195,6 +195,7 @@ const texts={
   en:{subtitle:"Days Since Opening", loading:"Loading...", notice:"*The displayed countdown is approximate and may not reflect the exact event time."}
 };
 
+// --- DOM ---
 const dayDisplay=document.getElementById("dayDisplay");
 const hourDisplay=document.getElementById("hourDisplay");
 const remainDisplay=document.getElementById("remainDisplay");
@@ -231,6 +232,7 @@ function updateDay(){
   const localTime=new Date(utc+offset);
   const startDate=new Date(expoDates[year].start);
   const endDate=new Date(expoDates[year].end);
+
   const diffMsStart=localTime-startDate;
   const diffMsEnd=endDate-localTime;
 
@@ -273,7 +275,7 @@ function toggleView(){ showDay=!showDay; updateDay(); }
 
 langToggleBtn.addEventListener('click',toggleLanguage);
 
-// 初期表示
+// --- 初期表示 ---
 dayDisplay.textContent=texts[lang].loading;
 updateTexts();
 updateDay();
@@ -298,6 +300,5 @@ setInterval(updateDay,1000);
   if(footer) footer.innerHTML=footerHTML;
 })();
 </script>
-
 </body>
 </html>
