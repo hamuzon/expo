@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2025大阪・関西万博 Countdown</title>
+<meta name="description" content="2025大阪・関西万博の開催日数カウント / Countdown of Expo 2025 Osaka, Kansai, Japan" />
+<meta name="author" content="hamuzon" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: linear-gradient(135deg, #0a1a2b, #203a43, #2c5364);
+  font-family: 'Roboto', sans-serif;
+  color: #e0f7fa;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.container {
+  background: rgba(255,255,255,0.07);
+  border-radius: 24px;
+  padding: 3rem 4rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 0 20px rgba(0,229,255,0.5);
+  text-align: center;
+  position: relative;
+}
+
+h1 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.8rem;
+  background: linear-gradient(90deg,#ff0000,#ffcc00,#0066ff);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 8px rgba(255,255,255,0.3),0 0 20px rgba(255,255,255,0.2);
+  margin-bottom: 0.3rem;
+}
+
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  background: linear-gradient(90deg,#00aaff,#00ffdd);
+  -webkit-background-clip:text;
+  color:transparent;
+  letter-spacing:0.15em;
+  margin-bottom:2rem;
+}
+
+#dayDisplay {
+  font-size:2.5rem;
+  font-weight:700;
+  background: linear-gradient(90deg,#ffcc00,#ff6600,#ffcc00);
+  -webkit-background-clip:text;
+  color:transparent;
+  text-shadow:0 0 10px rgba(255,255,255,0.3);
+  margin-bottom:1.2rem;
+}
+
+#hourDisplay,#remainDisplay {
+  font-size:1.2rem;
+  font-weight:500;
+  background: linear-gradient(90deg,#00ffff,#00aaff);
+  -webkit-background-clip:text;
+  color:transparent;
+  margin-bottom:1rem;
+  letter-spacing:0.05em;
+}
+
+#remainDisplay { margin-bottom:2rem; }
+
+.notice {
+  font-size: 0.85rem;
+  color: #4dd0e1;
+  opacity: 0.8;
+  margin-top: 1rem;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+}
+
+.footer {
+  font-size:0.9rem;
+  color:#4dd0e1;
+  letter-spacing:0.1em;
+  user-select:none;
+  margin-top:1rem;
+}
+
+.footer a.link {
+  text-decoration:none;
+  color:#4ac8e0;
+  font-weight:600;
+  transition:color 0.3s;
+}
+.footer a.link:hover,
+.footer a.link:visited,
+.footer a.link:active { color:#4ac8e0; text-decoration:underline; }
+
+.lang-toggle,
+.year-link,
+.view-toggle {
+  background: rgba(0,229,255,0.15);
+  border:none;
+  border-radius:20px;
+  color:#00e5ff;
+  font-weight:600;
+  padding:6px 14px;
+  cursor:pointer;
+  font-family:'Roboto',sans-serif;
+  transition:0.3s;
+  margin:0 4px;
+}
+.lang-toggle:hover,
+.year-link:hover,
+.view-toggle:hover { background: rgba(0,229,255,0.3); }
+
+.year-links { margin-bottom:1rem; }
+
+@media(max-width:480px){
+  .container{padding:2rem 2rem; max-width:320px;}
+  h1{font-size:2rem;}
+  #dayDisplay{font-size:2rem;margin-bottom:1rem;}
+  #hourDisplay,#remainDisplay{font-size:1rem;margin-bottom:1rem;}
+  h2{font-size:1rem;margin-bottom:1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="container" role="main" aria-live="polite">
+
+  <div class="year-links">
+    <button class="year-link" onclick="switchYear('2025')">2025</button>
+    <button class="year-link" onclick="switchYear('2027')">2027</button>
+    <button class="year-link" onclick="switchYear('2030')">2030</button>
+    <button class="lang-toggle" aria-label="Toggle Language">EN</button>
+  </div>
+
+  <button class="view-toggle" onclick="toggleView()" style="display:none;">日目／年月日切替</button>
+
+  <h1 id="title">読み込み中…</h1>
+  <h2 id="subtitle"></h2>
+  <p id="dayDisplay">読み込み中…</p>
+  <p id="hourDisplay"></p>
+  <p id="remainDisplay"></p>
+
+  <p class="notice" id="notice-text"></p>
+
+  <div class="footer" id="footer-copy"></div>
+</div>
+
+<script>
+let year='2025', lang='jp', showDay=true;
+
+const expoDates={
+  "2025": {start:"2025-04-13T10:00:00+09:00", end:"2025-10-13T20:00:00+09:00"},
+  "2027": {start:"2027-04-01T00:00:00+09:00", end:"2027-07-01T00:00:00+09:00"},
+  "2030": {start:"2030-04-01T00:00:00+03:00", end:"2030-10-01T00:00:00+03:00"}
+};
+
+const expoTitles={
+  "2025": {jp:"2025大阪・関西万博", en:"Expo 2025 Osaka, Kansai, Japan"},
+  "2027": {jp:"2027横浜万博", en:"Expo 2027 Yokohama"},
+  "2030": {jp:"2030リヤド万博", en:"Expo 2030 Riyadh"}
+};
+
+const texts={
+  jp:{subtitle:"開催からの経過日数カウント", loading:"読み込み中…", notice:"※表示されているカウントダウンは目安であり、正確な開催時刻とは異なる場合があります。"},
+  en:{subtitle:"Days Since Opening", loading:"Loading...", notice:"*The displayed countdown is approximate and may not reflect the exact event time."}
+};
+
+const dayDisplay=document.getElementById("dayDisplay");
+const hourDisplay=document.getElementById("hourDisplay");
+const remainDisplay=document.getElementById("remainDisplay");
+const titleEl=document.getElementById("title");
+const subtitleEl=document.getElementById("subtitle");
+const langToggleBtn=document.querySelector(".lang-toggle");
+const viewToggleBtn=document.querySelector(".view-toggle");
+const noticeText=document.getElementById("notice-text");
+
+function formatYMDHMS(ms){
+  let sec=Math.floor(ms/1000);
+  const y=Math.floor(sec/(365*24*3600)); sec-=y*365*24*3600;
+  const mo=Math.floor(sec/(30*24*3600)); sec-=mo*30*24*3600;
+  const d=Math.floor(sec/(24*3600)); sec-=d*24*3600;
+  const h=Math.floor(sec/3600); sec-=h*3600;
+  const m=Math.floor(sec/60); sec-=m*60;
+  const s=sec;
+  let str="";
+  if(y>0) str+=`${y}${lang==='jp'?'年':'y'} `;
+  if(mo>0) str+=`${mo}${lang==='jp'?'ヶ月':'mo'} `;
+  if(d>0) str+=`${d}${lang==='jp'?'日':'d'} `;
+  if(h>0) str+=`${h}${lang==='jp'?'時間':'h'} `;
+  if(m>0) str+=`${m}${lang==='jp'?'分':'m'} `;
+  if(s>0) str+=`${s}${lang==='jp'?'秒':'s'}`;
+  return str.trim();
+}
+
+function updateDay(){
+  const now=new Date();
+  const utc=now.getTime()+now.getTimezoneOffset()*60000;
+  const offset=(year==="2030"?3:9)*3600000;
+  const localTime=new Date(utc+offset);
+  const startDate=new Date(expoDates[year].start);
+  const endDate=new Date(expoDates[year].end);
+  const diffMsStart=localTime-startDate;
+  const diffMsEnd=endDate-localTime;
+
+  if(localTime>=startDate && localTime<=endDate){
+    viewToggleBtn.style.display="inline-block";
+    if(showDay){
+      const diffDays=Math.floor(diffMsStart/(1000*60*60*24))+1;
+      dayDisplay.textContent = lang==='jp' ? `今日は万博の ${diffDays} 日目` : `Today is day ${diffDays} of the Expo`;
+    } else{
+      dayDisplay.textContent=formatYMDHMS(diffMsStart);
+    }
+    remainDisplay.textContent = lang==='jp' ? `残り: ${formatYMDHMS(diffMsEnd)}` : `Remaining: ${formatYMDHMS(diffMsEnd)}`;
+    hourDisplay.textContent="";
+  } else{
+    viewToggleBtn.style.display="none";
+    if(localTime<startDate){
+      dayDisplay.textContent = lang==='jp' ? `開催まで: ${formatYMDHMS(startDate-localTime)}` : `Starts in: ${formatYMDHMS(startDate-localTime)}`;
+    } else{
+      dayDisplay.textContent = lang==='jp' ? `終了から: ${formatYMDHMS(localTime-endDate)}` : `Since closing: ${formatYMDHMS(localTime-endDate)}`;
+    }
+    hourDisplay.textContent="";
+    remainDisplay.textContent="";
+  }
+}
+
+function updateTexts(){
+  titleEl.textContent=expoTitles[year][lang];
+  subtitleEl.textContent=texts[lang].subtitle;
+  langToggleBtn.textContent=lang==='jp'?'EN':'JP';
+  viewToggleBtn.textContent=lang==='jp'?'日目／年月日切替':'Day / YMD Toggle';
+  noticeText.textContent=texts[lang].notice;
+
+  // ブラウザタブのタイトルも更新
+  document.title = expoTitles[year][lang] + ' Countdown';
+}
+
+function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; updateTexts(); updateDay(); }
+function switchYear(y){ year=y; updateTexts(); updateDay(); }
+function toggleView(){ showDay=!showDay; updateDay(); }
+
+langToggleBtn.addEventListener('click',toggleLanguage);
+
+// 初期表示
+dayDisplay.textContent=texts[lang].loading;
+updateTexts();
+updateDay();
+setInterval(updateDay,1000);
+
+// フッター自動表示
+(function(){
+  const baseYear=2025;
+  const currentYear=new Date().getFullYear();
+  const hostname=location.hostname;
+  const footer=document.getElementById("footer-copy");
+  let footerHTML="";
+  if(hostname==="hamuzon.github.io"){
+    footerHTML=`&copy; ${baseYear}${currentYear>baseYear?"–"+currentYear:""} <a class="link" href="https://hamuzon.github.io" target="_blank">@hamuzon</a>`;
+  } else if(hostname.includes("hamusata.f5.si")){
+    footerHTML=`&copy; ${baseYear}${currentYear>baseYear?"–"+currentYear:""} <a class="link" href="https://home.hamusata.f5.si" target="_blank">@hamusata</a>`;
+  } else if(hostname.includes("hamuzon-jp.f5.si")){
+    footerHTML=`&copy; ${baseYear}${currentYear>baseYear?"–"+currentYear:""} <a class="link" href="https://hamuzon-jp.f5.si" target="_blank">@hamuzon</a>`;
+  } else{
+    footerHTML=`&copy; ${baseYear}${currentYear>baseYear?"–"+currentYear:""} Expo Countdown`;
+  }
+  if(footer) footer.innerHTML=footerHTML;
+})();
+</script>
+
+</body>
+</html>
