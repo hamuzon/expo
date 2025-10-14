@@ -11,10 +11,14 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Roboto&display=swap');
 
+/* リセット */
 * { margin:0; padding:0; box-sizing:border-box; }
 
+/* 背景と全体 */
 body {
-  background: linear-gradient(135deg, #0a1a2b, #203a43, #2c5364);
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  background-size: 400% 400%;
+  animation: bgAnim 20s ease infinite;
   font-family: 'Roboto', sans-serif;
   color: #e0f7fa;
   min-height: 100vh;
@@ -24,17 +28,25 @@ body {
   padding: 1rem;
 }
 
+/* 背景アニメーション */
+@keyframes bgAnim {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
 .container {
   background: rgba(255,255,255,0.07);
   border-radius: 24px;
   padding: 3rem 4rem;
   max-width: 420px;
   width: 100%;
-  box-shadow: 0 0 20px rgba(0,229,255,0.5);
+  box-shadow: 0 0 40px rgba(0,229,255,0.5);
   text-align: center;
   position: relative;
 }
 
+/* タイトル */
 h1 {
   font-family: 'Orbitron', sans-serif;
   font-size: 2.8rem;
@@ -45,6 +57,7 @@ h1 {
   margin-bottom: 0.3rem;
 }
 
+/* サブタイトル */
 h2 {
   font-family: 'Orbitron', sans-serif;
   font-size: 1.1rem;
@@ -55,6 +68,7 @@ h2 {
   margin-bottom:2rem;
 }
 
+/* 日数カウント */
 #dayDisplay {
   font-size:2.5rem;
   font-weight:700;
@@ -77,6 +91,7 @@ h2 {
 
 #remainDisplay { margin-bottom:2rem; }
 
+/* 注意文 */
 .notice {
   font-size: 0.85rem;
   color: #4dd0e1;
@@ -86,6 +101,7 @@ h2 {
   line-height: 1.4;
 }
 
+/* フッター */
 .footer {
   font-size:0.9rem;
   color:#4dd0e1;
@@ -93,7 +109,6 @@ h2 {
   user-select:none;
   margin-top:1rem;
 }
-
 .footer a.link {
   text-decoration:none;
   color:#4ac8e0;
@@ -104,6 +119,7 @@ h2 {
 .footer a.link:visited,
 .footer a.link:active { color:#4ac8e0; text-decoration:underline; }
 
+/* ボタン */
 .lang-toggle,
 .year-link,
 .view-toggle {
@@ -124,6 +140,7 @@ h2 {
 
 .year-links { margin-bottom:1rem; }
 
+/* スマホ対応 */
 @media(max-width:480px){
   .container{padding:2rem 2rem; max-width:320px;}
   h1{font-size:2rem;}
@@ -158,6 +175,7 @@ h2 {
 </div>
 
 <script>
+// --- 初期変数 ---
 let year='2025', lang='jp', showDay=true;
 
 const expoDates={
@@ -186,6 +204,7 @@ const langToggleBtn=document.querySelector(".lang-toggle");
 const viewToggleBtn=document.querySelector(".view-toggle");
 const noticeText=document.getElementById("notice-text");
 
+// --- フォーマット関数 ---
 function formatYMDHMS(ms){
   let sec=Math.floor(ms/1000);
   const y=Math.floor(sec/(365*24*3600)); sec-=y*365*24*3600;
@@ -204,6 +223,7 @@ function formatYMDHMS(ms){
   return str.trim();
 }
 
+// --- 更新関数 ---
 function updateDay(){
   const now=new Date();
   const utc=now.getTime()+now.getTimezoneOffset()*60000;
@@ -236,17 +256,17 @@ function updateDay(){
   }
 }
 
+// --- テキスト更新 ---
 function updateTexts(){
   titleEl.textContent=expoTitles[year][lang];
   subtitleEl.textContent=texts[lang].subtitle;
   langToggleBtn.textContent=lang==='jp'?'EN':'JP';
   viewToggleBtn.textContent=lang==='jp'?'日目／年月日切替':'Day / YMD Toggle';
   noticeText.textContent=texts[lang].notice;
-
-  // ブラウザタブのタイトルも更新
   document.title = expoTitles[year][lang] + ' Countdown';
 }
 
+// --- イベント ---
 function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; updateTexts(); updateDay(); }
 function switchYear(y){ year=y; updateTexts(); updateDay(); }
 function toggleView(){ showDay=!showDay; updateDay(); }
@@ -259,7 +279,7 @@ updateTexts();
 updateDay();
 setInterval(updateDay,1000);
 
-// フッター自動表示
+// --- フッター ---
 (function(){
   const baseYear=2025;
   const currentYear=new Date().getFullYear();
