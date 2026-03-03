@@ -174,6 +174,7 @@ h2 {
 <script>
 // --- 初期変数 ---
 let year='2025', lang='jp', showDay=true;
+const STORAGE_KEY='expo-countdown-preferences';
 
 const expoDates={
   "2025": {start:"2025-04-13T10:00:00+09:00", end:"2025-10-13T20:00:00+09:00"},
@@ -201,29 +202,48 @@ const langToggleBtn=document.querySelector(".lang-toggle");
 const viewToggleBtn=document.querySelector(".view-toggle");
 const noticeText=document.getElementById("notice-text");
 
-function getExpoLocalTime(y){
-  const now=new Date();
-  const utc=now.getTime()+now.getTimezoneOffset()*60000;
-  const offset=(y==="2030"?3:9)*3600000;
-  return new Date(utc+offset);
+function getExpoNowUnixMs(){
+  return Date.now();
+}
+
+function getExpoRangeUnixMs(y){
+  return {
+    startMs: Date.parse(expoDates[y].start),
+    endMs: Date.parse(expoDates[y].end)
+  };
+}
+
+function loadPreferences(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const parsed=JSON.parse(raw);
+    if(parsed.lang==='jp' || parsed.lang==='en') lang=parsed.lang;
+    if(parsed.year && expoDates[parsed.year]) year=parsed.year;
+    return true;
+  }catch(_){ return false; }
+}
+
+function savePreferences(){
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify({lang,year}));
+  }catch(_){ /* noop */ }
 }
 
 function findDefaultYear(){
   const years=Object.keys(expoDates).sort((a,b)=>Number(a)-Number(b));
+  const nowMs=getExpoNowUnixMs();
 
   const ongoingYear=years.find((y)=>{
-    const localTime=getExpoLocalTime(y);
-    const startDate=new Date(expoDates[y].start);
-    const endDate=new Date(expoDates[y].end);
-    return localTime>=startDate && localTime<=endDate;
+    const {startMs,endMs}=getExpoRangeUnixMs(y);
+    return nowMs>=startMs && nowMs<=endMs;
   });
   if(ongoingYear) return ongoingYear;
 
   const futureYears=years
     .map((y)=>{
-      const localTime=getExpoLocalTime(y);
-      const startDate=new Date(expoDates[y].start);
-      return {y, diff:startDate-localTime};
+      const {startMs}=getExpoRangeUnixMs(y);
+      return {y,diff:startMs-nowMs};
     })
     .filter((item)=>item.diff>0)
     .sort((a,b)=>a.diff-b.diff);
@@ -231,9 +251,8 @@ function findDefaultYear(){
 
   const recentPastYear=years
     .map((y)=>{
-      const localTime=getExpoLocalTime(y);
-      const endDate=new Date(expoDates[y].end);
-      return {y, diff:localTime-endDate};
+      const {endMs}=getExpoRangeUnixMs(y);
+      return {y,diff:nowMs-endMs};
     })
     .filter((item)=>item.diff>=0)
     .sort((a,b)=>a.diff-b.diff);
@@ -261,13 +280,12 @@ function formatYMDHMS(ms){
 
 // --- 更新 ---
 function updateDay(){
-  const localTime=getExpoLocalTime(year);
-  const startDate=new Date(expoDates[year].start);
-  const endDate=new Date(expoDates[year].end);
-  const diffMsStart=localTime-startDate;
-  const diffMsEnd=endDate-localTime;
+  const nowMs=getExpoNowUnixMs();
+  const {startMs,endMs}=getExpoRangeUnixMs(year);
+  const diffMsStart=nowMs-startMs;
+  const diffMsEnd=endMs-nowMs;
 
-  if(localTime>=startDate && localTime<=endDate){
+  if(nowMs>=startMs && nowMs<=endMs){
     viewToggleBtn.style.display="inline-block";
     if(showDay){
       const diffDays=Math.floor(diffMsStart/(1000*60*60*24))+1;
@@ -279,10 +297,10 @@ function updateDay(){
     hourDisplay.textContent="";
   } else{
     viewToggleBtn.style.display="none";
-    if(localTime<startDate){
-      dayDisplay.textContent = lang==='jp' ? `開催まで: ${formatYMDHMS(startDate-localTime)}` : `Starts in: ${formatYMDHMS(startDate-localTime)}`;
+    if(nowMs<startMs){
+      dayDisplay.textContent = lang==='jp' ? `開催まで: ${formatYMDHMS(startMs-nowMs)}` : `Starts in: ${formatYMDHMS(startMs-nowMs)}`;
     } else{
-      dayDisplay.textContent = lang==='jp' ? `終了から: ${formatYMDHMS(localTime-endDate)}` : `Since closing: ${formatYMDHMS(localTime-endDate)}`;
+      dayDisplay.textContent = lang==='jp' ? `終了から: ${formatYMDHMS(nowMs-endMs)}` : `Since closing: ${formatYMDHMS(nowMs-endMs)}`;
     }
     hourDisplay.textContent="";
     remainDisplay.textContent="";
@@ -300,15 +318,17 @@ function updateTexts(){
 }
 
 // --- イベント ---
-function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; updateTexts(); updateDay(); }
-function switchYear(y){ year=y; updateTexts(); updateDay(); }
+function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; savePreferences(); updateTexts(); updateDay(); }
+function switchYear(y){ year=y; savePreferences(); updateTexts(); updateDay(); }
 function toggleView(){ showDay=!showDay; updateDay(); }
 
 langToggleBtn.addEventListener('click',toggleLanguage);
 
 // 初期表示
 dayDisplay.textContent=texts[lang].loading;
-year=findDefaultYear();
+const hasSavedPreferences=loadPreferences();
+if(!hasSavedPreferences || !expoDates[year]) year=findDefaultYear();
+savePreferences();
 updateTexts();
 updateDay();
 setInterval(updateDay,1000);
