@@ -230,6 +230,23 @@ function savePreferences(){
   }catch(_){ /* noop */ }
 }
 
+function normalizeLangParam(rawLang){
+  if(!rawLang) return null;
+  const lowered=rawLang.toLowerCase();
+  if(lowered==='jp' || lowered==='ja') return 'jp';
+  if(lowered==='en') return 'en';
+  return null;
+}
+
+function loadQueryParameters(){
+  const params=new URLSearchParams(window.location.search);
+  const queryYear=params.get('year');
+  const queryLang=normalizeLangParam(params.get('lang'));
+
+  if(queryYear && expoDates[queryYear]) year=queryYear;
+  if(queryLang) lang=queryLang;
+}
+
 function findDefaultYear(){
   const years=Object.keys(expoDates).sort((a,b)=>Number(a)-Number(b));
   const nowMs=getExpoNowUnixMs();
@@ -328,6 +345,7 @@ langToggleBtn.addEventListener('click',toggleLanguage);
 dayDisplay.textContent=texts[lang].loading;
 const hasSavedPreferences=loadPreferences();
 if(!hasSavedPreferences || !expoDates[year]) year=findDefaultYear();
+loadQueryParameters();
 savePreferences();
 updateTexts();
 updateDay();
