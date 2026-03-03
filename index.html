@@ -249,9 +249,17 @@ function loadQueryParameters(){
 
 function updateQueryParameters(){
   const params=new URLSearchParams(window.location.search);
-  params.set('year',year);
+  const defaultYear=findDefaultYear();
+
+  if(year===defaultYear){
+    params.delete('year');
+  } else{
+    params.set('year',year);
+  }
+
   params.set('lang',lang==='jp'?'ja':'en');
-  const newUrl=`${window.location.pathname}?${params.toString()}${window.location.hash}`;
+  const queryString=params.toString();
+  const newUrl=`${window.location.pathname}${queryString?`?${queryString}`:''}${window.location.hash}`;
   window.history.replaceState(null,'',newUrl);
 }
 
@@ -355,7 +363,6 @@ const hasSavedPreferences=loadPreferences();
 if(!hasSavedPreferences || !expoDates[year]) year=findDefaultYear();
 loadQueryParameters();
 savePreferences();
-updateQueryParameters();
 updateTexts();
 updateDay();
 setInterval(updateDay,1000);
