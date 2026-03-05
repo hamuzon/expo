@@ -134,10 +134,10 @@ a.back-btn:hover {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const isGitHubPagesRepo =
-    location.hostname === 'hamuzon.github.io' && location.pathname.startsWith('/olympic/');
+    location.hostname === 'hamuzon.github.io' && location.pathname.startsWith('/expo/');
 
   if (isGitHubPagesRepo) {
-    document.getElementById('backLink').href = 'https://hamuzon.github.io/olympic/';
+    document.getElementById('backLink').href = 'https://hamuzon.github.io/expo/';
   }
 });
 
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } else if (hostname.includes('hamusata.f5.si')) {
     footerHTML = `&copy; ${yearStr} <a href="https://hamusata.f5.si" target="_blank" rel="noopener noreferrer">@hamusata</a>`;
   } else {
-    footerHTML = `&copy; ${yearStr} Olympic Countdown`;
+    footerHTML = `&copy; ${yearStr} expo Countdown`;
   }
 
   if (footer) footer.innerHTML = footerHTML;
