@@ -1,5 +1,5 @@
 export async function onRequest(context) {
-  // version: v1.0.1
+  // version: v1.1.1
   const validPaths = ["/count", "/c", "/days", "/d"];
   const url = new URL(context.request.url);
   const pathSegments = url.pathname.split("/").filter(Boolean);
@@ -18,7 +18,7 @@ export async function onRequest(context) {
     "1990": {start:"1990-04-01T00:00:00+09:00", end:"1990-09-30T00:00:00+09:00"}, // 横浜万博
     "2005": {start:"2005-05-01T00:00:00+09:00", end:"2005-10-31T00:00:00+09:00"}, // 愛知万博
     "2025": {start:"2025-04-13T00:00:00+09:00", end:"2025-10-13T00:00:00+09:00"}, // 大阪・関西
-    "2027": {start:"2027-04-01T00:00:00+09:00", end:"2027-07-01T00:00:00+09:00"}, // 横浜
+    "2027": {start:"2027-03-19T00:00:00+09:00", end:"2027-09-26T00:00:00+09:00"}, // 横浜
     "2030": {start:"2030-04-01T00:00:00+03:00", end:"2030-10-01T00:00:00+03:00"}  // リヤド
   };
 
