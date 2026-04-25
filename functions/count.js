@@ -1,10 +1,12 @@
 export async function onRequest(context) {
+  // version: v1.0.1
   const validPaths = ["/count", "/c", "/days", "/d"];
   const url = new URL(context.request.url);
   const pathSegments = url.pathname.split("/").filter(Boolean);
   const basePath = "/" + (pathSegments[0] || "");
   const yearFromPath = pathSegments[1]; // /count/2025 の場合
   const yearFromQuery = url.searchParams.getAll("year"); // ?year=2025&year=2027 など
+  const langFromQuery = url.searchParams.get("lang");
 
   if (!validPaths.includes(basePath)) {
     return new Response("Not Found", {status: 404, headers: {"Content-Type":"text/plain; charset=utf-8"}});
@@ -21,9 +23,17 @@ export async function onRequest(context) {
   };
 
   const now = new Date();
+  function normalizeLang(rawLang) {
+    if (!rawLang) return null;
+    const lowered = rawLang.toLowerCase();
+    if (lowered === "en") return "en";
+    if (lowered === "ja" || lowered === "jp") return "jp";
+    return null;
+  }
+
   const langHeader = context.request.headers.get("Accept-Language") || "en";
   const isJapanese = /^ja\b/.test(langHeader);
-  const lang = isJapanese ? "jp" : "en";
+  const lang = normalizeLang(langFromQuery) || (isJapanese ? "jp" : "en");
 
   // 対象年リスト決定
   let targetYears = [];
