@@ -80,5 +80,9 @@ export async function onRequest(context) {
     return text;
   });
 
-  return new Response(lines.join("\n"), {headers: {"Content-Type":"text/plain; charset=utf-8"}});
+  const title = targetYears.length===1
+    ? (lang==='jp' ? `${targetYears[0]} 万博カウント` : `${targetYears[0]} Expo Countdown`)
+    : (lang==='jp' ? "万博カウント一覧" : "Expo Countdown List");
+
+  return new Response([title, ...lines].join("\n"), {headers: {"Content-Type":"text/plain; charset=utf-8"}});
 }
