@@ -104,8 +104,8 @@ export async function onRequest(context) {
         : `${y}: Since closing: ${daysSince} days`;
     }
 
-    // 2025以降は予定変更の可能性あり注意文追加
-    if (parseInt(y) >= 2025) {
+    // 2027以降は予定変更の可能性あり注意文追加
+    if (parseInt(y) >= 2027) {
       text += lang==='jp' ? "（予定は変更される場合があります）" : " (Schedule may change)";
     }
 
