@@ -19,20 +19,31 @@ export async function onRequest(context) {
     "2027": {start:"2027-04-01T00:00:00+09:00", end:"2027-07-01T00:00:00+09:00"}, // 横浜
     "2030": {start:"2030-04-01T00:00:00+03:00", end:"2030-10-01T00:00:00+03:00"}  // リヤド
   };
+  const orderedYears = Object.keys(expoDates);
+
+  function normalizeLang(rawLang) {
+    if (!rawLang) return null;
+    const lowered = rawLang.toLowerCase();
+    if (lowered === "ja" || lowered === "jp") return "jp";
+    if (lowered === "en") return "en";
+    return null;
+  }
 
   const now = new Date();
+  const langQuery = normalizeLang(url.searchParams.get("lang"));
   const langHeader = context.request.headers.get("Accept-Language") || "en";
   const isJapanese = /^ja\b/.test(langHeader);
-  const lang = isJapanese ? "jp" : "en";
+  const lang = langQuery || (isJapanese ? "jp" : "en");
 
   // 対象年リスト決定
   let targetYears = [];
   if (yearFromPath && expoDates[yearFromPath]) {
     targetYears = [yearFromPath];
   } else if (yearFromQuery.length) {
-    targetYears = yearFromQuery.filter(y => expoDates[y]);
+    const queryYearSet = new Set(yearFromQuery.filter(y => expoDates[y]));
+    targetYears = orderedYears.filter(y => queryYearSet.has(y));
   } else {
-    targetYears = Object.keys(expoDates);
+    targetYears = orderedYears;
   }
 
   if (!targetYears.length) {
