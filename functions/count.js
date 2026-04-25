@@ -35,6 +35,37 @@ export async function onRequest(context) {
   const isJapanese = /^ja\b/.test(langHeader);
   const lang = langQuery || (isJapanese ? "jp" : "en");
 
+  function findDefaultYear() {
+    const nowMs = now.getTime();
+    let nearestFuture = null;
+    let nearestPast = null;
+    for (const y of orderedYears) {
+      const startMs = Date.parse(expoDates[y].start);
+      const endMs = Date.parse(expoDates[y].end);
+
+      // 開催中があれば最優先
+      if (nowMs >= startMs && nowMs <= endMs) {
+        return y;
+      }
+
+      if (nowMs < startMs) {
+        const diff = startMs - nowMs;
+        if (!nearestFuture || diff < nearestFuture.diff) {
+          nearestFuture = {y, diff};
+        }
+      } else {
+        const diff = nowMs - endMs;
+        if (!nearestPast || diff < nearestPast.diff) {
+          nearestPast = {y, diff};
+        }
+      }
+    }
+
+    if (nearestFuture) return nearestFuture.y;
+    if (nearestPast) return nearestPast.y;
+    return orderedYears[0];
+  }
+
   // 対象年リスト決定
   let targetYears = [];
   if (yearFromPath && expoDates[yearFromPath]) {
@@ -43,7 +74,7 @@ export async function onRequest(context) {
     const queryYearSet = new Set(yearFromQuery.filter(y => expoDates[y]));
     targetYears = orderedYears.filter(y => queryYearSet.has(y));
   } else {
-    targetYears = orderedYears;
+    targetYears = [findDefaultYear()];
   }
 
   if (!targetYears.length) {
