@@ -19,62 +19,20 @@ export async function onRequest(context) {
     "2027": {start:"2027-04-01T00:00:00+09:00", end:"2027-07-01T00:00:00+09:00"}, // 横浜
     "2030": {start:"2030-04-01T00:00:00+03:00", end:"2030-10-01T00:00:00+03:00"}  // リヤド
   };
-  const orderedYears = Object.keys(expoDates);
-
-  function normalizeLang(rawLang) {
-    if (!rawLang) return null;
-    const lowered = rawLang.toLowerCase();
-    if (lowered === "ja" || lowered === "jp") return "jp";
-    if (lowered === "en") return "en";
-    return null;
-  }
 
   const now = new Date();
-  const langQuery = normalizeLang(url.searchParams.get("lang"));
   const langHeader = context.request.headers.get("Accept-Language") || "en";
   const isJapanese = /^ja\b/.test(langHeader);
-  const lang = langQuery || (isJapanese ? "jp" : "en");
-
-  function findDefaultYear() {
-    const nowMs = now.getTime();
-    let nearestFuture = null;
-    let nearestPast = null;
-    for (const y of orderedYears) {
-      const startMs = Date.parse(expoDates[y].start);
-      const endMs = Date.parse(expoDates[y].end);
-
-      // 開催中があれば最優先
-      if (nowMs >= startMs && nowMs <= endMs) {
-        return y;
-      }
-
-      if (nowMs < startMs) {
-        const diff = startMs - nowMs;
-        if (!nearestFuture || diff < nearestFuture.diff) {
-          nearestFuture = {y, diff};
-        }
-      } else {
-        const diff = nowMs - endMs;
-        if (!nearestPast || diff < nearestPast.diff) {
-          nearestPast = {y, diff};
-        }
-      }
-    }
-
-    if (nearestFuture) return nearestFuture.y;
-    if (nearestPast) return nearestPast.y;
-    return orderedYears[0];
-  }
+  const lang = isJapanese ? "jp" : "en";
 
   // 対象年リスト決定
   let targetYears = [];
   if (yearFromPath && expoDates[yearFromPath]) {
     targetYears = [yearFromPath];
   } else if (yearFromQuery.length) {
-    const queryYearSet = new Set(yearFromQuery.filter(y => expoDates[y]));
-    targetYears = orderedYears.filter(y => queryYearSet.has(y));
+    targetYears = yearFromQuery.filter(y => expoDates[y]);
   } else {
-    targetYears = [findDefaultYear()];
+    targetYears = Object.keys(expoDates);
   }
 
   if (!targetYears.length) {
