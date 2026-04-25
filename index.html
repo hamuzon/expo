@@ -238,13 +238,27 @@ function normalizeLangParam(rawLang){
   return null;
 }
 
-function loadQueryParameters(){
+function initFromQueryParams(){
   const params=new URLSearchParams(window.location.search);
   const queryYear=params.get('year');
   const queryLang=normalizeLangParam(params.get('lang'));
 
-  if(queryYear && expoDates[queryYear]) year=queryYear;
   if(queryLang) lang=queryLang;
+  if(queryYear && expoDates[queryYear]) year=queryYear;
+}
+
+function syncQueryParams(){
+  const params=new URLSearchParams();
+  if(year && expoDates[year]){
+    params.set('year',year);
+  }
+  params.set('lang',lang==='jp'?'ja':'en');
+
+  const newQuery=params.toString();
+  const newUrl=`${window.location.pathname}?${newQuery}`;
+  if(newUrl!==`${window.location.pathname}${window.location.search}`){
+    history.replaceState({},'',newUrl);
+  }
 }
 
 function findDefaultYear(){
@@ -335,8 +349,8 @@ function updateTexts(){
 }
 
 // --- イベント ---
-function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; savePreferences(); updateTexts(); updateDay(); }
-function switchYear(y){ year=y; savePreferences(); updateTexts(); updateDay(); }
+function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; savePreferences(); updateTexts(); updateDay(); syncQueryParams(); }
+function switchYear(y){ year=y; savePreferences(); updateTexts(); updateDay(); syncQueryParams(); }
 function toggleView(){ showDay=!showDay; updateDay(); }
 
 langToggleBtn.addEventListener('click',toggleLanguage);
@@ -345,8 +359,9 @@ langToggleBtn.addEventListener('click',toggleLanguage);
 dayDisplay.textContent=texts[lang].loading;
 const hasSavedPreferences=loadPreferences();
 if(!hasSavedPreferences || !expoDates[year]) year=findDefaultYear();
-loadQueryParameters();
+initFromQueryParams();
 savePreferences();
+syncQueryParams();
 updateTexts();
 updateDay();
 setInterval(updateDay,1000);
