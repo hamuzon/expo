@@ -178,8 +178,8 @@ const STORAGE_KEY='expo-countdown-preferences';
 
 const expoDates={
   "2025": {start:"2025-04-13T10:00:00+09:00", end:"2025-10-13T20:00:00+09:00"},
-  "2027": {start:"2027-04-01T00:00:00+09:00", end:"2027-07-01T00:00:00+09:00"},
-  "2030": {start:"2030-04-01T00:00:00+03:00", end:"2030-10-01T00:00:00+03:00"}
+  "2027": {start:"2027-03-19T00:00:00+09:00", end:"2027-09-26T00:00:00+09:00"},
+  "2030": {start:"2030-10-01T00:00:00+03:00", end:"2031-03-31T00:00:00+03:00"}
 };
 
 const expoTitles={
@@ -238,13 +238,27 @@ function normalizeLangParam(rawLang){
   return null;
 }
 
-function loadQueryParameters(){
+function initFromQueryParams(){
   const params=new URLSearchParams(window.location.search);
   const queryYear=params.get('year');
   const queryLang=normalizeLangParam(params.get('lang'));
 
-  if(queryYear && expoDates[queryYear]) year=queryYear;
   if(queryLang) lang=queryLang;
+  if(queryYear && expoDates[queryYear]) year=queryYear;
+}
+
+function syncQueryParams(){
+  const params=new URLSearchParams();
+  if(year && expoDates[year]){
+    params.set('year',year);
+  }
+  params.set('lang',lang==='jp'?'ja':'en');
+
+  const newQuery=params.toString();
+  const newUrl=`${window.location.pathname}?${newQuery}`;
+  if(newUrl!==`${window.location.pathname}${window.location.search}`){
+    history.replaceState({},'',newUrl);
+  }
 }
 
 function findDefaultYear(){
@@ -335,8 +349,8 @@ function updateTexts(){
 }
 
 // --- イベント ---
-function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; savePreferences(); updateTexts(); updateDay(); }
-function switchYear(y){ year=y; savePreferences(); updateTexts(); updateDay(); }
+function toggleLanguage(){ lang=(lang==='jp')?'en':'jp'; savePreferences(); updateTexts(); updateDay(); syncQueryParams(); }
+function switchYear(y){ year=y; savePreferences(); updateTexts(); updateDay(); syncQueryParams(); }
 function toggleView(){ showDay=!showDay; updateDay(); }
 
 langToggleBtn.addEventListener('click',toggleLanguage);
@@ -345,8 +359,9 @@ langToggleBtn.addEventListener('click',toggleLanguage);
 dayDisplay.textContent=texts[lang].loading;
 const hasSavedPreferences=loadPreferences();
 if(!hasSavedPreferences || !expoDates[year]) year=findDefaultYear();
-loadQueryParameters();
+initFromQueryParams();
 savePreferences();
+syncQueryParams();
 updateTexts();
 updateDay();
 setInterval(updateDay,1000);

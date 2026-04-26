@@ -35,6 +35,8 @@ jobs:
         with:
           source: ./
           destination: ./_site
+      - name: Remove functions sources from Pages artifact
+        run: rm -rf ./_site/functions
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
