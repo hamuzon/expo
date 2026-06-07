@@ -35,8 +35,14 @@ jobs:
         with:
           source: ./
           destination: ./_site
-      - name: Remove functions sources from Pages artifact
-        run: sudo rm -rf ./_site/functions
+      - name: Inject normalization script into HTML
+        run: |
+          sudo chown -R $USER:$USER ./_site
+          find ./_site -maxdepth 1 -name "*.html" -not -name "google*.html" -exec sed -i '/<head>/a \  <script>if(window.location.hostname.endsWith(".")){window.location.replace(window.location.href.replace(window.location.hostname,window.location.hostname.slice(0,-1)));}</script>' {} +
+      - name: Remove sensitive files from deployment artifact
+        run: |
+          # デプロイ対象から削除
+          cd ./_site && rm -f README.md README readme.md license LICENSE LICENSE.txt _redirects.md _redirects
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
@@ -50,4 +56,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
