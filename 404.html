@@ -7,6 +7,79 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
 <link rel="icon" href="favicon.ico" sizes="any" />
 
+<script>
+  (function () {
+    const targetHost = "expo-countdown.pages.dev";
+    const currentHost = window.location.hostname;
+
+    if (
+      !currentHost ||
+      currentHost === "localhost" ||
+      currentHost === "127.0.0.1" ||
+      currentHost === targetHost ||
+      currentHost.startsWith("expo-countdown.")
+    ) {
+      return;
+    }
+
+    const segments = window.location.pathname.split("/").filter(Boolean);
+    const params = new URLSearchParams(window.location.search);
+
+    const year =
+      params.get("year") ||
+      segments.find((s) => /^\d{4}$/.test(s)) ||
+      "2027";
+
+    const lang =
+      params.get("lang") ||
+      segments.find((s) => {
+        const l = s.toLowerCase();
+        return l === "ja" || l === "en";
+      }) ||
+      (navigator.language && navigator.language.startsWith("ja")
+        ? "ja"
+        : "en");
+
+    let targetDomain = targetHost;
+    let targetPath = `/${year}/${lang}`;
+
+    if (currentHost === "expo.hamusata.f5.si") {
+      targetDomain = "expo-countdown.hamusata.f5.si";
+    } else if (currentHost === "expo.hamuzon-jp.f5.si") {
+      targetDomain = "expo-countdown.hamuzon-jp.f5.si";
+    } else if (currentHost === "hamuzon.github.io") {
+      targetDomain = "hamuzon.github.io";
+      targetPath = `/expo-countdown/${year}/${lang}`;
+    }
+
+    const destination = `https://${targetDomain}${targetPath}`;
+
+    if (
+      typeof gtag === "function" &&
+      !currentHost.includes("github.io")
+    ) {
+      const eventName =
+        "redirect_from_" + currentHost.replace(/[\.-]/g, "_");
+
+      gtag("event", eventName, {
+        event_category: "redirection",
+        event_label: destination,
+        transport_type: "beacon",
+        event_callback: function () {
+          window.location.replace(destination);
+        },
+      });
+
+      setTimeout(function () {
+        window.location.replace(destination);
+      }, 500);
+    } else {
+      window.location.replace(destination);
+    }
+  })();
+</script>
+  
+  
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
